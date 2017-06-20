@@ -2,20 +2,18 @@
 <html>
 	<head>
 	  <title>Encrypted Box</title>
-	  <script src="nacl_factory.js"></script>
+	  <script src="sjcl.js"></script>
 	</head>
 	<body>
 		<script>
 		function alertUser() {
-			nacl_factory.instantiate(function (nacl) {
-				var current_date = (new Date()).valueOf().toString();
-				var random = Math.random().toString();
-				var key = nacl.crypto_hash_string(current_date + random);
-				var text = document.getElementById('word').value;
-
-				var b64encoded = btoa(String.fromCharCode.apply(null, key));
-				alert(btoa(b64encoded));
-			})
+			var current_date = (new Date()).valueOf().toString();
+			var random = Math.random().toString();
+			var key = sjcl.hash.sha256.hash(current_date + random);
+			var cipher = sjcl.cipher.aes(key);
+			var text = document.getElementById('word').value;
+			var val = cipher.encrypt(key, text);
+			alert(val);
 		}
 		</script>
 		<div>
