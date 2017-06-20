@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+	<head>
+	  <title>Encrypted Box</title>
+	  <script src="nacl_factory.js"></script>
+	</head>
+	<body>
+		<script>
+		function alertUser() {
+			nacl_factory.instantiate(function (nacl) {
+				var current_date = (new Date()).valueOf().toString();
+				var random = Math.random().toString();
+				var key = nacl.crypto_hash_string(current_date + random);
+				var text = document.getElementById('word').value;
+
+				var b64encoded = btoa(String.fromCharCode.apply(null, key));
+				alert(btoa(b64encoded));
+			})
+		}
+		</script>
+		<div>
+			<textarea id="word" rows="30" cols="100"></textarea>
+			<br>
+			<button onclick="alertUser();">Submit</button>
+		</div>
+	</body>
+</html>
