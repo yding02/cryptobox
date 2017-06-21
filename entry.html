@@ -2,24 +2,48 @@
 <html>
 	<head>
 	  <title>Encrypted Box</title>
-	  <script src="sjcl.js"></script>
+	  <script src="js/sjcl.js"></script>
 	</head>
 	<body>
 		<script>
+		function _arrayBufferToBase64( buffer ) {
+		  var binary = '';
+		  var bytes = new Uint8Array( buffer );
+		  var len = bytes.byteLength;
+		  for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+      }
+		  return window.btoa( binary );
+		}
+
 		function alertUser() {
 			var current_date = (new Date()).valueOf().toString();
 			var random = Math.random().toString();
 			var key = sjcl.hash.sha256.hash(current_date + random);
-			var cipher = sjcl.cipher.aes(key);
 			var text = document.getElementById('word').value;
-			var val = cipher.encrypt(key, text);
-			alert(val);
+			var val = sjcl.encrypt(key, text);
+
+			current_date = (new Date()).valueOf().toString();
+			random = Math.random().toString();
+			var pkey = sjcl.hash.sha256.hash(current_date + random);
+
+			var link = "localhost:8080/paste/" + 
+			_arrayBufferToBase64(pkey) + "#" + 
+			_arrayBufferToBase64(key);
+
+			document.getElementById("submit").style.visibility = "hidden";
+			document.getElementById("link").style.visibility = "visible";
+			document.getElementById("link_text").value = link;
 		}
 		</script>
 		<div>
 			<textarea id="word" rows="30" cols="100"></textarea>
 			<br>
-			<button onclick="alertUser();">Submit</button>
+			<button id="submit" onclick="alertUser();">Submit</button>
+		</div>
+		<div id="link" style="visibility:hidden">
+			<p>Your Link</p>
+			<input id="link_text" type="text" value="">
 		</div>
 	</body>
 </html>
