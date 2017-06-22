@@ -61,7 +61,7 @@
 		function alertUser() {
 			var current_date = (new Date()).valueOf().toString();
 			var random = Math.random().toString();
-			var key = sjcl.hash.sha256.hash(current_date + random);
+			var key = intArrayToString(sjcl.hash.sha256.hash(current_date + random));
 			var text = document.getElementById('word').value;
 			var val = sjcl.encrypt(key, text);
 
@@ -71,16 +71,11 @@
 
 			var link = "localhost:8080/paste/" + 
 			encodeURIComponent(intArrayToBase64(pkey)) + "#" + 
-			encodeURIComponent(intArrayToBase64(key));
-
-			var temp = base64ToIntArray(decodeURIComponent(encodeURIComponent(intArrayToBase64(key))));
-
-			alert(sjcl.decrypt(temp, JSON.parse(JSON.stringify(val))));
+			encodeURIComponent(btoa(key));
 
 			document.getElementById("submit").style.visibility = "hidden";
 			document.getElementById("link").style.visibility = "visible";
 			document.getElementById("link_text").value = link;
-			document.getElementById("encrypted").value = JSON.stringify(val);
 		}
 		</script>
 		<div>
@@ -92,7 +87,6 @@
 			<p>Your Link</p>
 			<input id="link_text" type="text" value="">
 			<br>
-			<textarea id="encrypted"></textarea>
 		</div>
 	</body>
 </html>
