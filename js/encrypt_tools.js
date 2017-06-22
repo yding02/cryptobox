@@ -14,16 +14,8 @@ function intArrayToString(intArray) {
   return binary;
 }
 
-function intArrayToBase64( intArray ) {
-  var binary = '';
-  var length = intArray.length;
-  for (var t = 0; t < length; t++) {
-    i = intArray[t];
-    binary += String.fromCharCode((i & 0xFF000000) >>> 24);
-    binary += String.fromCharCode((i & 0x00FF0000) >>> 16);
-    binary += String.fromCharCode((i & 0x0000FF00) >>> 8);
-    binary += String.fromCharCode(i & 0x000000FF);
-  }
+function intArrayToBase64( ntArray) {
+  var binary = inArrayToString(intArray);
   return window.btoa( binary );
 }
 
