@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+	<head>
+	<title>Decrypted Box</title>
+	  <script src="js/sjcl.js"></script>
+	</head>
+
+	<body onload="start();">
+		<script>
+		function start() {
+			var message = "{\"iv\":\"LkBYGyhNZMcmrPNXG9L7Kg==\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"ct\":\"v/apnYhx89lMwU99dw7Ipw==\"}";
+			var obj = JSON.parse(message);
+
+			function base64ToIntArray( base64 ) {
+				var binary = window.atob(base64);
+				var length = binary.length;
+				var intArray = [];
+				var i = 0;
+				for (; i + 4 <= length; i += 4) {
+					var val = (binary.charCodeAt(i) << 24) ^ (binary.charCodeAt(i + 1) << 16) ^ 
+						(binary.charCodeAt(i + 2) << 8) ^ binary.charCodeAt(i + 3);
+					intArray.push(val);
+				}
+				return intArray;
+			}
+
+			if (window.location.hash) {
+				var key64 = decodeURIComponent(window.location.hash).substring(1);
+				alert(key64);
+				var key = base64ToIntArray(key64);
+				alert(key);
+				var text = sjcl.decrypt(key, obj);
+				document.getElementById("paste").value = text;
+			}
+		}
+		</script>
+		
+		<textarea id="paste"></textarea>
+	</body>
+
+</html>

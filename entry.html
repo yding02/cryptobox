@@ -6,17 +6,6 @@
 	</head>
 	<body>
 		<script>
-		function _arrayBufferToBase64( buffer ) {
-		  var binary = '';
-		  var bytes = new Uint8Array( buffer );
-		  alert(bytes);
-		  var len = bytes.byteLength;
-		  for (var i = 0; i < len; i++) {
-       	 	binary += String.fromCharCode( bytes[ i ] );
-      	  }
-		  return window.btoa( binary );
-		}
-
 		function intArrayToBase64( intArray ) {
 			var binary = '';
 			var length = intArray.length;
@@ -40,9 +29,10 @@
 					(binary.charCodeAt(i + 2) << 8) ^ binary.charCodeAt(i + 3);
 				intArray.push(val);
 			}
+			/*
 			var rest = 0;
 			var append = 0;
-			/*
+			
 			for (; i < length; i++) {
 				rest += binary.charCodeAt(i);
 				rest << 8;
@@ -53,6 +43,19 @@
 			}
 			*/
 			return intArray;
+		}
+
+		function intArrayToString(intArray) {
+			var binary = '';
+			var length = intArray.length;
+			for (var t = 0; t < length; t++) {
+				i = intArray[t];
+				binary += String.fromCharCode((i & 0xFF000000) >>> 24);
+				binary += String.fromCharCode((i & 0x00FF0000) >>> 16);
+				binary += String.fromCharCode((i & 0x0000FF00) >>> 8);
+				binary += String.fromCharCode(i & 0x000000FF);
+			}
+			return binary;
 		}
 
 		function alertUser() {
@@ -67,12 +70,17 @@
 			var pkey = sjcl.hash.sha256.hash(current_date + random);
 
 			var link = "localhost:8080/paste/" + 
-			intArrayToBase64(pkey) + "#" + 
-			intArrayToBase64(key);
+			encodeURIComponent(intArrayToBase64(pkey)) + "#" + 
+			encodeURIComponent(intArrayToBase64(key));
+
+			var temp = base64ToIntArray(decodeURIComponent(encodeURIComponent(intArrayToBase64(key))));
+
+			alert(sjcl.decrypt(temp, JSON.parse(JSON.stringify(val))));
 
 			document.getElementById("submit").style.visibility = "hidden";
 			document.getElementById("link").style.visibility = "visible";
 			document.getElementById("link_text").value = link;
+			document.getElementById("encrypted").value = JSON.stringify(val);
 		}
 		</script>
 		<div>
@@ -83,6 +91,8 @@
 		<div id="link" style="visibility:hidden">
 			<p>Your Link</p>
 			<input id="link_text" type="text" value="">
+			<br>
+			<textarea id="encrypted"></textarea>
 		</div>
 	</body>
 </html>
