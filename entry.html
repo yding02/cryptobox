@@ -3,85 +3,13 @@
   <head>
     <title>Encrypted Box</title>
     <script src="js/sjcl.js"></script>
+    <script src="js/encrypt_tools.js"></script>
   </head>
   <body>
-    <script>
-    function intArrayToBase64( intArray ) {
-      var binary = '';
-      var length = intArray.length;
-      for (var t = 0; t < length; t++) {
-        i = intArray[t];
-        binary += String.fromCharCode((i & 0xFF000000) >>> 24);
-        binary += String.fromCharCode((i & 0x00FF0000) >>> 16);
-        binary += String.fromCharCode((i & 0x0000FF00) >>> 8);
-        binary += String.fromCharCode(i & 0x000000FF);
-      }
-      return window.btoa( binary );
-    }
-
-    function base64ToIntArray( base64 ) {
-      var binary = window.atob(base64);
-      var length = binary.length;
-      var intArray = [];
-      var i = 0;
-      for (; i + 4 <= length; i += 4) {
-        var val = (binary.charCodeAt(i) << 24) ^ (binary.charCodeAt(i + 1) << 16) ^ 
-          (binary.charCodeAt(i + 2) << 8) ^ binary.charCodeAt(i + 3);
-        intArray.push(val);
-      }
-      /*
-      var rest = 0;
-      var append = 0;
-      
-      for (; i < length; i++) {
-        rest += binary.charCodeAt(i);
-        rest << 8;
-        append += 1;
-      }
-      if (append > 0) {
-        intArray.push(rest << (8 * (4 - append)));
-      }
-      */
-      return intArray;
-    }
-
-    function intArrayToString(intArray) {
-      var binary = '';
-      var length = intArray.length;
-      for (var t = 0; t < length; t++) {
-        i = intArray[t];
-        binary += String.fromCharCode((i & 0xFF000000) >>> 24);
-        binary += String.fromCharCode((i & 0x00FF0000) >>> 16);
-        binary += String.fromCharCode((i & 0x0000FF00) >>> 8);
-        binary += String.fromCharCode(i & 0x000000FF);
-      }
-      return binary;
-    }
-
-    function alertUser() {
-      var current_date = (new Date()).valueOf().toString();
-      var random = Math.random().toString();
-      var key = intArrayToString(sjcl.hash.sha256.hash(current_date + random));
-      var text = document.getElementById('word').value;
-      var val = sjcl.encrypt(key, text);
-
-      current_date = (new Date()).valueOf().toString();
-      random = Math.random().toString();
-      var pkey = sjcl.hash.sha256.hash(current_date + random);
-
-      var link = "localhost:8080/paste/" + 
-      encodeURIComponent(intArrayToBase64(pkey)) + "#" + 
-      encodeURIComponent(btoa(key));
-
-      document.getElementById("submit").style.visibility = "hidden";
-      document.getElementById("link").style.visibility = "visible";
-      document.getElementById("link_text").value = link;
-    }
-    </script>
     <div>
       <textarea id="word" rows="30" cols="100"></textarea>
       <br>
-      <button id="submit" onclick="alertUser();">Submit</button>
+      <button id="submit" onclick="encryptAndSend();">Submit</button>
     </div>
     <div id="link" style="visibility:hidden">
       <p>Your Link</p>

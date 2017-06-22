@@ -3,27 +3,10 @@
   <head>
   <title>Decrypted Box</title>
     <script src="js/sjcl.js"></script>
+    <script src="js/encrypt_tools.js"></script>
   </head>
 
-  <body onload="start();">
-    <script>
-    function start() {
-      var message = "{\"iv\":\"SnYP60FHdKZhKDqRsfkKvQ==\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"toVVdjacfOY=\",\"ct\":\"itga0H65IVN0KO8L6no7NPMJ/GPp22nToEEPgEOnci1KM+EE1Q==\"}";
-
-      try {
-        if (window.location.hash) {
-          var key = atob(decodeURIComponent(window.location.hash).substring(1));
-          var text = sjcl.decrypt(key, message);
-          document.getElementById("paste").value = text;
-        } else {
-          document.getElementById("paste").value = "You don't seem to have the key or have an incorrect key";
-        } 
-      }
-      catch (err) {
-        document.getElementById("paste").value = "You don't seem to have the key or have an incorrect key";
-      }
-    }
-    </script>
+  <body onload='decrpytAndDisplay("{\"iv\":\"SnYP60FHdKZhKDqRsfkKvQ==\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"toVVdjacfOY=\",\"ct\":\"itga0H65IVN0KO8L6no7NPMJ/GPp22nToEEPgEOnci1KM+EE1Q==\"}");'>
     
     <textarea id="paste" rows="30" cols="100"></textarea>
   </body>
