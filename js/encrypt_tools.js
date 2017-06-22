@@ -14,7 +14,7 @@ function intArrayToString(intArray) {
   return binary;
 }
 
-function intArrayToBase64( ntArray) {
+function intArrayToBase64(intArray) {
   var binary = intArrayToString(intArray);
   return window.btoa( binary );
 }
