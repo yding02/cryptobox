@@ -37,15 +37,44 @@ function encryptAndSend() {
   encodeURIComponent(intArrayToBase64(pkey)) + "#" + 
   encodeURIComponent(btoa(key));
 
-  document.getElementById("submit").style.visibility = "hidden";
-  document.getElementById("link").style.visibility = "visible";
-  document.getElementById("link_text").value = link;
+  //request server for stuff
+  var obj = {"key" : pkey, "value" : val};
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("submit").style.visibility = "hidden";
+      document.getElementById("link").style.visibility = "visible";
+      document.getElementById("link_text").value = link;
+    }
+  };
+  xhttp.open("POST", "api/post/", true);
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send(JSON.stringify(obj));
 }
 
 //////////////
 //decrypt page
 //////////////
-function decrpytAndDisplay(message) {
+function decryptAndDisplay() {
+  var path = window.location.pathname;
+  var parts = path.split(',');
+  if (parts.length < 3) {
+    document.getElementById("paste").value = "you seem to have an invalid link";
+    return;
+  }
+  var key = parts[2];
+  var obj = {"key" : key}
+  
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      decryptAndDisplayHelper(this.responseText);
+    }
+  };
+  xhttp.open("POST", "api/retrieve/", true);
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send(JSON.stringify(obj));
+}
+
+function decryptAndDisplayHelper(message) {
   try {
     if (window.location.hash) {
       var key = atob(decodeURIComponent(window.location.hash).substring(1));
@@ -59,4 +88,3 @@ function decrpytAndDisplay(message) {
     document.getElementById("paste").value = "You don't seem to have the key or have an incorrect key";
   }
 }
-
