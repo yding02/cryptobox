@@ -38,9 +38,11 @@ function encryptAndSend() {
   encodeURIComponent(btoa(key));
 
   //request server for stuff
-  var obj = {"key" : pkey, "value" : val};
+  var obj = {"key" : intArrayToBase64(pkey), "value" : val};
+
+  var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
+    if (this.readyState == 4 && this.status == 201) {
       document.getElementById("submit").style.visibility = "hidden";
       document.getElementById("link").style.visibility = "visible";
       document.getElementById("link_text").value = link;
@@ -56,20 +58,23 @@ function encryptAndSend() {
 //////////////
 function decryptAndDisplay() {
   var path = window.location.pathname;
-  var parts = path.split(',');
+  var parts = path.split('/');
+  //console.log(parts);
   if (parts.length < 3) {
     document.getElementById("paste").value = "you seem to have an invalid link";
     return;
   }
   var key = parts[2];
-  var obj = {"key" : key}
+  var obj = {"key" : decodeURIComponent(key)}
   
+  var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      decryptAndDisplayHelper(this.responseText);
+      s = JSON.parse(this.responseText).value
+      decryptAndDisplayHelper(JSON.stringify(s));
     }
   };
-  xhttp.open("POST", "api/retrieve/", true);
+  xhttp.open("POST", "../api/retrieve/", true);
   xhttp.setRequestHeader("Content-type", "application/json");
   xhttp.send(JSON.stringify(obj));
 }
