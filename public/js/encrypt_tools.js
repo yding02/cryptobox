@@ -72,6 +72,8 @@ function decryptAndDisplay() {
     if (this.readyState == 4 && this.status == 200) {
       s = JSON.parse(this.responseText).value
       decryptAndDisplayHelper(JSON.stringify(s));
+    } else {
+      document.getElementById("paste").value = "you seem to have an invalid link";      
     }
   };
   xhttp.open("POST", "../api/retrieve/", true);
