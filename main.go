@@ -3,25 +3,15 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"database/sql"
 	_ "github.com/lib/pq"
     "errors"
 	"log"
 	"io/ioutil"
-	"encoding/json"
 )
 
 type Note struct {
 	Key string `json="key"`
 	Value string `json="value"`
-}
-
-func openDB() *sql.DB {
-	db, err := sql.Open("postgres", "user=app dbname=encryptbox password=pass")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return db
 }
 
 func handleInsert(key string, value string) bool {
@@ -39,7 +29,8 @@ func handleSelect(key string) (string, error) {
 
 	rows, err := db.Query(`SELECT value FROM entries WHERE key = $1`, key)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return "", err
 	}
 	if rows.Next() {
 		var value string
@@ -62,16 +53,8 @@ func retrieveHandler(w http.ResponseWriter, r *http.Request) {
 func retrievePasteHandler(w http.ResponseWriter, r *http.Request) {
 	var note Note
 	//read body
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+	err := readBodyAndStore(r, &note)
 	
-	//get json
-	err = json.Unmarshal(body, &note)
-	if err != nil {
-		fmt.Print(err)
-		fmt.Print("error!")
-		return
-	}
 	if len(note.Key) != 44 || r.Header.Get("Content-Type") != "application/json" {
 		w.WriteHeader(400)
 		log.Println(note.Key)
@@ -93,16 +76,8 @@ func retrievePasteHandler(w http.ResponseWriter, r *http.Request) {
 func postPasteHandler(w http.ResponseWriter, r *http.Request) {
 	var note Note
 	//read body
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
-	
-	//get json
-	err = json.Unmarshal(body, &note)
-	if err != nil {
-		fmt.Print(err)
-		fmt.Print("error!")
-		return
-	}
+	err := readBodyAndStore(r, &note)
+
 	if len(note.Key) != 44 || note.Value == "" || err != nil{
 		w.WriteHeader(400)
 		fmt.Fprintf(w, "Bad Request Key, %d", len(note.Key))
