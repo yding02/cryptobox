@@ -9,5 +9,5 @@ Go 1.6+
 
 ## Installation
 set up postges database (will detail later) <br>
-set gopath to repo directory (e.g `export GOPATH=~/path/to/repo`) <br>
+set gopath to repo directory (e.g `export GOPATH=/path/to/repo`) <br>
 run `go build main.go`
